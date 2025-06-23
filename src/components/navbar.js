@@ -9,8 +9,8 @@ return (
       <div className="links">
          
         <Link to="/">Home</Link>
-         <Link to="/About">Register</Link> 
-        <Link to="/Create">Login</Link>
+         <Link to="/registration">Register</Link> 
+        <Link to="/login">Login</Link>
       
       </div>
     </nav>

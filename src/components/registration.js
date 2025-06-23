@@ -1,38 +1,96 @@
+
+// src/components/rregistration.js
 import React, { useState } from 'react';
+import axios from 'axios';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: ''
+  const [data, setData] = useState({
+    firstname: '',
+    lastname: '',
+    gender: ''
   });
 
-  const handleChange = e => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setData({ ...data, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async e => {
+  const saveStudent = async (e) => {
     e.preventDefault();
-    const response = await fetch('http://localhost:5000/api/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(formData)
-    });
 
-    if (response.ok) {
-      alert('Registration successful!');
-    } else {
-      alert('Something went wrong.');
+     setSuccessMessage("");
+    setErrorMessage("");
+
+    try {
+      // Removed unused response variable
+      await axios.post(
+        "http://localhost:4000/api/addStudent",
+        formData,
+        {
+          withCredentials: true,
+        }
+      );
+
+      setSuccessMessage("✅ Student added successfully");
+      setFormData({ firstname: "", lastname: "", gender: "" });
+    } catch (error) {
+      console.error("❌ Error:", error.response?.data || error.message);
+      setErrorMessage(
+        error.response?.data?.error?.message || "Failed to add student."
+      );
     }
   };
-
+  
   return (
-    <form onSubmit={handleSubmit}>
-      <input name="username" value={formData.username} onChange={handleChange} placeholder="Username" />
-      <input name="email" value={formData.email} onChange={handleChange} placeholder="Email" type="email" />
-      <input name="password" type="password" value={formData.password} onChange={handleChange} placeholder="Password" />
-      <button type="submit">Register</button>
-    </form>
+    <div className="container mt-5">
+      <ToastContainer />
+      <h3 className="mb-4">Add Student</h3>
+      <Form onSubmit={saveStudent}>
+        <Form.Group className="mb-3">
+          <Form.Label>First Name</Form.Label>
+          <Form.Control
+            type="text"
+            name="firstname"
+            value={data.firstname}
+            onChange={handleChange}
+            required
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Last Name</Form.Label>
+          <Form.Control
+            type="text"
+            name="lastname"
+            value={data.lastname}
+            onChange={handleChange}
+            required
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Gender</Form.Label>
+          <Form.Select
+            name="gender"
+            value={data.gender}
+            onChange={handleChange}
+            required
+          >
+            <option value="">-- Select Gender --</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Other">Other</option>
+          </Form.Select>
+        </Form.Group>
+
+        <Button variant="primary" type="submit">
+         register student
+        </Button>
+      </Form>
+    </div>
   );
 };
 
