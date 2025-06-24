@@ -9,10 +9,13 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
   const [data, setData] = useState({
-    firstname: '',
-    lastname: '',
+    Firstname: '',
+    Lastname: '',
     gender: ''
   });
+
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
@@ -28,14 +31,14 @@ const Register = () => {
       // Removed unused response variable
       await axios.post(
         "http://localhost:4000/api/addStudent",
-        formData,
+        data,
         {
           withCredentials: true,
         }
       );
 
       setSuccessMessage("✅ Student added successfully");
-      setFormData({ firstname: "", lastname: "", gender: "" });
+      setData({ Firstname: "", Lastname: "", gender: "" });
     } catch (error) {
       console.error("❌ Error:", error.response?.data || error.message);
       setErrorMessage(
@@ -43,7 +46,7 @@ const Register = () => {
       );
     }
   };
-  
+
   return (
     <div className="container mt-5">
       <ToastContainer />
