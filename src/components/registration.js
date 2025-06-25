@@ -7,9 +7,10 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
     const [data, setData] = useState({
-        firstname: '',
-        lastname: '',
-        gender: ''
+        // this match with what is in model student file
+        Firstname: '',
+        Lastname: '',
+        Gender: ''
     });
 
     const handleChange = (e) => {
@@ -26,7 +27,7 @@ const Register = () => {
             });
 
             toast.success("✅ Student added successfully");
-            setData({ firstname: "", lastname: "", gender: "" });
+            setData({ Firstname: "", Lastname: "", Gender: "" });
         } catch (error) {
             console.error("❌ Error:", error.response?.data || error.message);
             toast.error(
@@ -44,7 +45,7 @@ const Register = () => {
                     <Form.Label>First Name</Form.Label>
                     <Form.Control
                         type="text"
-                        name="firstname"
+                        name="Firstname"
                         value={data.firstname}
                         onChange={handleChange}
                         required
@@ -55,7 +56,7 @@ const Register = () => {
                     <Form.Label>Last Name</Form.Label>
                     <Form.Control
                         type="text"
-                        name="lastname"
+                        name="Lastname"
                         value={data.lastname}
                         onChange={handleChange}
                         required
@@ -65,7 +66,7 @@ const Register = () => {
                 <Form.Group className="mb-3">
                     <Form.Label>Gender</Form.Label>
                     <Form.Select
-                        name="gender"
+                        name="Gender"
                         value={data.gender}
                         onChange={handleChange}
                         required
