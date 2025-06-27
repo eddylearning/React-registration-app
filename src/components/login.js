@@ -1,68 +1,76 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Table, Spinner } from 'react-bootstrap';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
 
-// src/components/GetStudents.js
 const Login = () => {
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const fetchStudents = async () => {
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    if (!email || !password) {
+      toast.error('Please enter both email and password', { position: 'top-right' });
+      return;
+    }
+
     try {
-      const token = sessionStorage.getItem('access_token'); // Optional if using auth
-      const response = await axios.get('http://localhost:4000/api/getAllStudent', {
-        headers: {
-          Authorization: `Bearer ${token}`, // Optional
-        },
+      const response = await axios.post('http://localhost:4000/api/login', {
+        email,
+        password,
       });
-      setStudents(response.data);
+
+      // Optional: Save token or user data
+      const { token, user } = response.data;
+      sessionStorage.setItem('access_token', token);
+      toast.success(`Welcome, ${user.name || user.email || 'User'}`, {
+        position: 'top-right',
+      });
+
+      // Optional redirect
+      // navigate('/students');
     } catch (error) {
-      console.error('❌ Failed to fetch students:', error);
-      toast.error('Failed to fetch students');
-    } finally {
-      setLoading(false);
+      console.error('Login error:', error);
+      toast.error(error.response?.data?.message || 'Login failed', {
+        position: 'top-right',
+      });
     }
   };
 
-  useEffect(() => {
-    fetchStudents();
-  }, []);
-
   return (
     <div className="container mt-5">
-      <ToastContainer position="top-right" autoClose={3000} />
-      <h3 className="mb-4 text-center">All Students</h3>
+      <ToastContainer />
+      <h3 className="mb-4">Login</h3>
+      <Form onSubmit={handleLogin}>
+        <Form.Group className="mb-3" controlId="formEmail">
+          <Form.Label>Email address</Form.Label>
+          <Form.Control
+            type="email"
+            placeholder="Enter email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </Form.Group>
 
-      {loading ? (
-        <div className="text-center mt-4">
-          <Spinner animation="border" variant="primary" />
-        </div>
-      ) : students.length === 0 ? (
-        <p className="text-center text-muted">No students found.</p>
-      ) : (
-        <Table striped bordered hover responsive>
-          <thead className="table-dark">
-            <tr>
-              <th>#</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Gender</th>
-            </tr>
-          </thead>
-          <tbody>
-            {students.map((student, index) => (
-              <tr key={student._id || index}>
-                <td>{index + 1}</td>
-                <td>{student.Firstname || student.firstname}</td>
-                <td>{student.Lastname || student.lastname}</td>
-                <td>{student.Gender || student.gender}</td>
-              </tr>
-            ))}
-          </tbody>
-        </Table>
-      )}
+        <Form.Group className="mb-3" controlId="formPassword">
+          <Form.Label>Password</Form.Label>
+          <Form.Control
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+        </Form.Group>
+
+        <Button variant="primary" type="submit">
+          Login
+        </Button>
+      </Form>
     </div>
   );
 };
