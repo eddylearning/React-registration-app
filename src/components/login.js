@@ -1,78 +1,68 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+
+import React, { useState, useContext } from 'react';
+import { Form, Button } from 'react-bootstrap';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
+import { useNavigate } from 'react-router-dom';
+
+import { AuthContext } from '../context/AuthContext'; // adjust path
 
 const Login = () => {
+  const { login, loading, error } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const navigate = useNavigate();
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     if (!email || !password) {
-      toast.error('Please enter both email and password', { position: 'top-right' });
+      toast.error('Please fill in both email and password');
       return;
     }
 
-    try {
-      const response = await axios.post('http://localhost:4000/api/login', {
-        email,
-        password,
-      });
-
-      // Optional: Save token or user data
-      const { token, user } = response.data;
-      sessionStorage.setItem('access_token', token);
-      toast.success(`Welcome, ${user.name || user.email || 'User'}`, {
-        position: 'top-right',
-      });
-
-      // Optional redirect
-      // navigate('/students');
-    } catch (error) {
-      console.error('Login error:', error);
-      toast.error(error.response?.data?.message || 'Login failed', {
-        position: 'top-right',
-      });
-    }
+    await login(email, password, () => {
+      toast.success('✅ Logged in successfully');
+      navigate('/students'); // redirect after login
+    });
   };
 
   return (
     <div className="container mt-5">
       <ToastContainer />
       <h3 className="mb-4">Login</h3>
-      <Form onSubmit={handleLogin}>
-        <Form.Group className="mb-3" controlId="formEmail">
-          <Form.Label>Email address</Form.Label>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group controlId="formEmail" className="mb-3">
+          <Form.Label>Email</Form.Label>
           <Form.Control
             type="email"
-            placeholder="Enter email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter email"
             required
           />
         </Form.Group>
 
-        <Form.Group className="mb-3" controlId="formPassword">
+        <Form.Group controlId="formPassword" className="mb-3">
           <Form.Label>Password</Form.Label>
           <Form.Control
             type="password"
-            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password"
             required
           />
         </Form.Group>
 
-        <Button variant="primary" type="submit">
-          Login
+        <Button type="submit" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
         </Button>
+
+        {error && <div className="text-danger mt-3">{error}</div>}
       </Form>
     </div>
   );
 };
 
 export default Login;
+
